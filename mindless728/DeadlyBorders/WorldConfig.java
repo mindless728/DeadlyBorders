@@ -11,7 +11,8 @@ public class WorldConfig {
 		minX = maxX = minZ = maxZ = 0;
 	}
 
-	public WorldConfig(int mx, int Mx, int mz, int Mz) {
+	public WorldConfig(String nm, int mx, int Mx, int mz, int Mz) {
+		worldName = nm;
 		minX = mx;
 		maxX = Mx;
 		minZ = mz;

@@ -3,6 +3,8 @@ package mindless728.DeadlyBorders;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.World;
 
@@ -16,18 +18,23 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class DeadlyBorders extends JavaPlugin implements CommandExecutor {
-	HashMap<World, WorldConfig> borders;
-	WorldConfig defaultBorder;
-	String configFile;
+	protected HashMap<World, WorldConfig> borders;
+	protected WorldConfig defaultBorder;
+	private String configFile;
+	private DeadlyBordersPlayerListener playerListener;
 
 	public DeadlyBorders() {
 		borders = new HashMap<World, WorldConfig>();
-		defaultBorder = new WorldConfig(Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+		defaultBorder = new WorldConfig("Default",Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+		playerListener = new DeadlyBordersPlayerListener(this);
 	}
 
 	public void onEnable() {
 		configFile = getDataFolder().getPath()+File.separatorChar+"DeadlyBorders.txt";
+		getDataFolder().mkdir();
 		loadConfig();
+
+		getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, playerListener, Priority.High, this);
 
 		System.out.println(getDescription().getName()+" version "+getDescription().getVersion()+" enabled");
 	}
@@ -82,6 +89,7 @@ public class DeadlyBorders extends JavaPlugin implements CommandExecutor {
 					borders.put(w, wc);
 				}
 			}
+			scanner.close();
 		} catch(FileNotFoundException fnfe) {
 			saveConfig();
 		} catch(Exception e) {
@@ -120,6 +128,8 @@ public class DeadlyBorders extends JavaPlugin implements CommandExecutor {
 			writer.write("Max-Z: "+defaultBorder.maxZ);
 			writer.newLine();
 			writer.write("EndWorld");
+			writer.newLine();
+			writer.close();
 		} catch(IOException ioe) {}
 	}
 }
